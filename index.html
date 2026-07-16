@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Director | Portfolio</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CSS VARIABLES & BASICS --- */
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #f4f4f4;
+            --accent: #ccff00; /* Neon Yellow/Green */
+            --card-bg: #1a1a1a;
+            --font-head: 'Syne', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: var(--bg-color); color: var(--text-color);
+            font-family: var(--font-body); overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        h1, h2, h3 { font-family: var(--font-head); text-transform: uppercase; }
+        a { text-decoration: none; color: inherit; }
+
+        /* --- NAVIGATION / MENU --- */
+        .logo {
+            position: fixed; top: 30px; left: 40px; font-family: var(--font-head); font-weight: 800; 
+            font-size: 1.5rem; z-index: 100; letter-spacing: 2px; color: #fff; mix-blend-mode: difference;
+        }
+        
+        .menu-btn {
+            position: fixed; top: 30px; right: 40px; z-index: 100; cursor: pointer;
+            width: 40px; height: 30px; display: flex; flex-direction: column; justify-content: space-between;
+            mix-blend-mode: difference;
+        }
+        .menu-btn span { display: block; height: 3px; width: 100%; background: #fff; transition: var(--transition); }
+        .menu-btn.active span:nth-child(1) { transform: translateY(13.5px) rotate(45deg); background: var(--accent); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; }
+        .menu-btn.active span:nth-child(3) { transform: translateY(-13.5px) rotate(-45deg); background: var(--accent); }
+
+        .nav-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px); z-index: 99;
+            display: flex; align-items: center; justify-content: center;
+            clip-path: circle(0% at 100% 0%); transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .nav-overlay.active { clip-path: circle(150% at 100% 0%); }
+        
+        .nav-links { list-style: none; text-align: center; }
+        .nav-links li { margin: 30px 0; transform: translateY(50px); opacity: 0; transition: var(--transition); }
+        .nav-overlay.active .nav-links li { transform: translateY(0); opacity: 1; }
+        .nav-overlay.active .nav-links li:nth-child(1) { transition-delay: 0.2s; }
+        .nav-overlay.active .nav-links li:nth-child(2) { transition-delay: 0.3s; }
+        .nav-overlay.active .nav-links li:nth-child(3) { transition-delay: 0.4s; }
+        .nav-links a { font-size: 4rem; font-family: var(--font-head); font-weight: 800; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--accent); -webkit-text-stroke: 1px var(--accent); color: transparent; }
+
+        /* --- HEADER (HERO) --- */
+        header { position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .hero-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: 0.6; }
+        .hero-content { text-align: center; z-index: 1; animation: fadeUp 1.5s ease forwards; }
+        .hero-content h1 { font-size: 6vw; font-weight: 800; line-height: 1; margin-bottom: 20px; }
+        .hero-content p { font-size: 1.5rem; font-weight: 300; max-width: 600px; margin: 0 auto; color: #ccc; }
+        
+        /* --- PORTFOLIO SECTION --- */
+        #portfolio { padding: 100px 5%; }
+        
+        /* Filters & Search */
+        .filter-wrapper { 
+            position: relative; /* WICHTIG: Erlaubt Z-Index */
+            z-index: 50;        /* WICHTIG: Hebt die Filter und das Dropdown über das Grid! */
+            display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 60px; 
+        }
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; }
+        .filter-btn {
+            background: transparent; color: var(--text-color); border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 25px; border-radius: 30px; cursor: pointer; font-family: var(--font-body);
+            font-size: 0.9rem; transition: var(--transition); text-transform: uppercase; letter-spacing: 1px;
+        }
+        .filter-btn:hover, .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 20px rgba(204, 255, 0, 0.4); }
+
+        /* Search Bar & Dropdown */
+        .search-container { position: relative; display: flex; align-items: center; margin-left: 20px; }
+        .search-box {
+            display: flex; align-items: center; background: transparent; border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px; padding: 5px; transition: var(--transition); overflow: hidden;
+        }
+        .search-box.active { background: rgba(255,255,255,0.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(204, 255, 0, 0.2); }
+        .search-icon { width: 20px; height: 20px; fill: var(--text-color); margin: 0 10px; cursor: pointer; transition: fill 0.3s; }
+        .search-box.active .search-icon { fill: var(--accent); }
+        #searchInput {
+            width: 0; background: transparent; border: none; color: var(--text-color); font-family: var(--font-body);
+            outline: none; transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1), padding 0.5s, opacity 0.5s; opacity: 0; font-size: 0.9rem;
+        }
+        .search-box.active #searchInput { width: 180px; padding: 5px 10px 5px 0; opacity: 1; }
+        
+        /* Dynamic Hashtag Dropdown */
+        .hashtag-dropdown {
+            position: absolute; top: calc(100% + 15px); right: 0; width: 280px;
+            background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px; padding: 20px; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;
+            opacity: 0; pointer-events: none; transform: translateY(-15px); transition: var(--transition);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        .hashtag-dropdown.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .hashtag-dropdown::before {
+            content: ''; position: absolute; top: -10px; right: 25px; border-width: 0 10px 10px 10px;
+            border-style: solid; border-color: transparent transparent rgba(255,255,255,0.1) transparent;
+        }
+        .hashtag-dropdown li {
+            background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem;
+            cursor: pointer; transition: var(--transition); color: #ccc; border: 1px solid transparent;
+        }
+        .hashtag-dropdown li:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; position: relative; z-index: 10;}
+
+        /* Project Card */
+        .card { position: relative; height: 500px; border-radius: 15px; overflow: hidden; background: var(--card-bg); transform: scale(1); transition: var(--transition); opacity: 1; transform-origin: center; z-index: 1; }
+        .card.hidden { display: none; }
+        .card.fade-out { opacity: 0; transform: scale(0.8); }
+        .card.fade-in { animation: popIn 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
+        /* Card Backgrounds */
+        .card-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: transform 0.8s ease; z-index: 1; }
+        .card:hover .card-bg { transform: scale(1.1); filter: brightness(0.3) blur(3px); }
+        .bg-img { background-size: cover; background-position: center; }
+        .bg-video { object-fit: cover; width: 100%; height: 100%; }
+
+        /* Card Content */
+        .card-header { position: absolute; top: 20px; left: 20px; right: 20px; z-index: 2; transition: var(--transition); }
+        .card h2 { font-size: 1.8rem; margin-bottom: 5px; color: #fff; }
+        .card h3 { font-size: 1rem; color: var(--accent); font-weight: 600; }
+        .tags { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .tag { background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 5px; font-size: 0.7rem; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); }
+
+        /* Hover Overlay */
+        .card-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 70%;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 20%, transparent);
+            z-index: 3; padding: 30px 20px; display: flex; flex-direction: column; justify-content: flex-end;
+            transform: translateY(100%); opacity: 0; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .card:hover .card-overlay { transform: translateY(0); opacity: 1; }
+        .card-overlay .short-desc { font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; color: #fff;}
+        .card-overlay .long-desc { font-size: 0.85rem; line-height: 1.5; color: #bbb; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .download-btn {
+            display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: #000;
+            padding: 12px 20px; font-weight: 700; border-radius: 30px; font-size: 0.9rem; transition: transform 0.3s; width: max-content;
+        }
+        .download-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(204,255,0,0.2); }
+
+        /* --- CONTACT SECTION --- */
+        #contact {
+            padding: 150px 5%; min-height: 70vh; display: flex; align-items: center; justify-content: center;
+            background: #050505; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); position: relative;
+        }
+        .contact-content { z-index: 2; }
+        .contact-content h2 { font-size: 2rem; color: var(--accent); margin-bottom: 20px; letter-spacing: 2px;}
+        .big-email {
+            font-family: var(--font-head); font-size: 6vw; font-weight: 800; color: transparent;
+            -webkit-text-stroke: 1px var(--text-color); transition: var(--transition); display: block; margin: 30px 0;
+        }
+        .big-email:hover { color: var(--accent); -webkit-text-stroke: 1px var(--accent); transform: scale(1.02); }
+        .socials { display: flex; gap: 40px; justify-content: center; font-family: var(--font-head); text-transform: uppercase; font-weight: 700; font-size: 1.1rem; }
+        .socials a { transition: color 0.3s, transform 0.3s; display: inline-block; }
+        .socials a:hover { color: var(--accent); transform: translateY(-5px); }
+
+        /* --- FLOATING CONTACT ICON --- */
+        .floating-contact {
+            position: fixed; right: 30px; bottom: 30px; width: 65px; height: 65px; background: var(--accent);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 90;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 0 20px rgba(204,255,0,0.3);
+        }
+        .floating-contact svg { width: 30px; height: 30px; fill: #000; transition: transform 0.3s; }
+        .floating-contact:hover { transform: scale(1.15) translateY(-5px); box-shadow: 0 15px 30px rgba(204,255,0,0.6); }
+        .floating-contact:hover svg { transform: rotate(-15deg); }
+
+        /* Animations */
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(50px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* Scroll Reveal Utility */
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <!-- FLOATING CONTACT ICON -->
+    <a href="#contact" class="floating-contact" aria-label="Go to Contact">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z"/>
+        </svg>
+    </a>
+
+    <!-- NAVIGATION -->
+    <div class="logo">A.D.</div>
+    <div class="menu-btn" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+    </div>
+    <nav class="nav-overlay">
+        <ul class="nav-links">
+            <li><a href="#home" onclick="toggleMenu()">Home</a></li>
+            <li><a href="#portfolio" onclick="toggleMenu()">Work</a></li>
+            <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- HEADER / HERO -->
+    <header id="home">
+        <video class="hero-video" autoplay loop muted playsinline>
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-287-large.mp4" type="video/mp4">
+        </video>
+        <div class="hero-content">
+            <h1>Visualizing<br>The Future.</h1>
+            <p>Cutting-Edge Art Direction, UI/UX & Motion Design.</p>
+        </div>
+    </header>
+
+    <!-- MAIN PORTFOLIO -->
+    <main id="portfolio">
+        
+        <!-- FILTERS & SEARCH -->
+        <div class="filter-wrapper reveal">
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All Works</button>
+                <button class="filter-btn" data-filter="print">Print</button>
+                <button class="filter-btn" data-filter="digital">Digital</button>
+                <button class="filter-btn" data-filter="ui-ux">UI/UX</button>
+                <button class="filter-btn" data-filter="video">Video</button>
+                <button class="filter-btn" data-filter="3d">3D</button>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search hashtags or title..." autocomplete="off">
+                </div>
+                <!-- Dropdown populated by JS -->
+                <ul class="hashtag-dropdown" id="hashtagList"></ul>
+            </div>
+        </div>
+
+        <!-- GRID -->
+        <div class="grid">
+            
+            <!-- Item 1 -->
+            <article class="card reveal mix print">
+                <div class="card-bg bg-img" style="background-image: url('https://images.unsplash.com/photo-1587334274328-64186a80aebc?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-header">
+                    <h2>Vogue Redesign</h2>
+                    <h3>Editorial Concept</h3>
+                    <div class="tags"><span class="tag">#Print</span><span class="tag">#Typography</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Moderne Print-Ästhetik</div>
+                    <p class="long-desc">Ein radikaler Redesign-Ansatz für ein renommiertes Fashion-Magazin. Fokus lag auf asymmetrischen Grids, brutalistischer Typografie und hochwertiger Weißraum-Nutzung.</p>
+                    <a href="#" class="download-btn">Case Study laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 2 -->
+            <article class="card reveal mix ui-ux digital">
+                <div class="card-bg" style="background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);"></div>
+                <div class="card-header">
+                    <h2>NeoBank App</h2>
+                    <h3>Fintech Interface</h3>
+                    <div class="tags"><span class="tag">#UI/UX</span><span class="tag">#Digital</span><span class="tag">#App</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Die Bank in der Hosentasche</div>
+                    <p class="long-desc">Entwicklung einer intuitiven User Experience für eine moderne Krypto- und Fiat-Bank. Inklusive Dark-Mode, haptischem Feedback-Design und flüssigen Mikro-Interaktionen.</p>
+                    <a href="#" class="download-btn">Prototyp laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 3 -->
+            <article class="card reveal mix video">
+                <video class="card-bg bg-video" autoplay loop muted playsinline>
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-lines-and-light-4855-large.mp4" type="video/mp4">
+                </video>
+                <div class="card-header">
+                    <h2>Cyber Pulse</h2>
+                    <h3>Commercial Teaser</h3>
+                    <div class="tags"><span class="tag">#Video</span><span class="tag">#Motion</span><span class="tag">#VFX</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Dynamische Produktinszenierung</div>
+                    <p class="long-desc">Ein 60-sekündiger Werbespot für einen globalen Tech-Konzern. Die Art Direktion verschmilzt reale Cinematographie mit abstrakten, glitch-basierten Motion Graphics.</p>
+                    <a href="#" class="download-btn">Video (MP4) laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 4 -->
+            <article class="card reveal mix 3d digital">
+                <div class="card-bg bg-img" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-header">
+                    <h2>Abstract Matter</h2>
+                    <h3>CGI Artworks</h3>
+                    <div class="tags"><span class="tag">#3D</span><span class="tag">#Digital</span><span class="tag">#Render</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Surreale Raumkonzepte</div>
+                    <p class="long-desc">Eine Serie von 3D-Renderings, die für eine Kunstausstellung entworfen wurden. Die Texturen simulieren organische und anorganische Materialien in Schwerelosigkeit.</p>
+                    <a href="#" class="download-btn">High-Res Bilder ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 5 -->
+            <article class="card reveal mix ui-ux digital">
+                <div class="card-bg bg-img" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-header">
+                    <h2>Data Dashboard</h2>
+                    <h3>SaaS Plattform</h3>
+                    <div class="tags"><span class="tag">#UI/UX</span><span class="tag">#Digital</span><span class="tag">#Web</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Komplexität vereinfacht</div>
+                    <p class="long-desc">Gestaltung eines umfangreichen Dashboards für Datenanalysten. Der Fokus lag auf Barrierefreiheit, klarer Datenvisualisierung und einem modularen Widgets-System.</p>
+                    <a href="#" class="download-btn">Design System ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 6 -->
+            <article class="card reveal mix print">
+                 <div class="card-bg" style="background: radial-gradient(circle, #2b2b2b, #000);"></div>
+                <div class="card-header">
+                    <h2>Onyx Perfume</h2>
+                    <h3>Packaging Design</h3>
+                    <div class="tags"><span class="tag">#Print</span><span class="tag">#Branding</span><span class="tag">#Packaging</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Luxus zum Anfassen</div>
+                    <p class="long-desc">Konzept und Reinzeichnung für das Packaging eines Nischenparfums. Verwendung von mattschwarzem Karton mit glänzender Heißfolienprägung.</p>
+                    <a href="#" class="download-btn">Print-PDF laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 7 -->
+            <article class="card reveal mix 3d video">
+                <video class="card-bg bg-video" autoplay loop muted playsinline>
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-rotating-planet-earth-loop-4144-large.mp4" type="video/mp4">
+                </video>
+                <div class="card-header">
+                    <h2>Orbit App</h2>
+                    <h3>3D WebGL Intro</h3>
+                    <div class="tags"><span class="tag">#3D</span><span class="tag">#Video</span><span class="tag">#WebGL</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Interaktive Startsequenz</div>
+                    <p class="long-desc">Entwicklung eines rotierenden 3D-Globus als Hero-Element für eine Logistik-Webseite. Der Nutzer kann die Weltkugel drehen und Routen interaktiv erkunden.</p>
+                    <a href="#" class="download-btn">Source Code laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 8 -->
+            <article class="card reveal mix digital ui-ux">
+                <div class="card-bg bg-img" style="background-image: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-header">
+                    <h2>Techwear Shop</h2>
+                    <h3>E-Commerce</h3>
+                    <div class="tags"><span class="tag">#UI/UX</span><span class="tag">#Digital</span><span class="tag">#AR</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Futuristisches Shopping</div>
+                    <p class="long-desc">Ein Headless E-Commerce Setup für ein Techwear-Label. Integriert wurde ein virtueller "Fitting Room", bei dem AR-Technologie direkt im Browser genutzt wird.</p>
+                    <a href="#" class="download-btn">Figma File laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 9 -->
+            <article class="card reveal mix print digital">
+                <div class="card-bg" style="background: linear-gradient(45deg, #ff00cc, #333399);"></div>
+                <div class="card-header">
+                    <h2>Neon Nights</h2>
+                    <h3>Festival Identity</h3>
+                    <div class="tags"><span class="tag">#Print</span><span class="tag">#Digital</span><span class="tag">#Branding</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">360° Markenauftritt</div>
+                    <p class="long-desc">Entwicklung der kompletten Corporate Identity für ein Musikfestival. Das Projekt umfasste Plakatwände sowie Social Media Templates und eine animierte Website.</p>
+                    <a href="#" class="download-btn">Brand Guidelines ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 10 -->
+            <article class="card reveal mix video">
+                 <div class="card-bg bg-img" style="background-image: url('https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-header">
+                    <h2>Urban Echo</h2>
+                    <h3>Music Video</h3>
+                    <div class="tags"><span class="tag">#Video</span><span class="tag">#Direction</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Visuelle Poesie in 4K</div>
+                    <p class="long-desc">Art Direction und Regie für das Musikvideo eines aufstrebenden Hip-Hop Künstlers. Fokus auf starkes Color-Grading (Teal & Orange) und dynamische Kamerafahrten.</p>
+                    <a href="#" class="download-btn">Director's Cut ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 11 -->
+            <article class="card reveal mix 3d">
+                <div class="card-bg bg-img" style="background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-header">
+                    <h2>Future Mobility</h2>
+                    <h3>Concept Car Render</h3>
+                    <div class="tags"><span class="tag">#3D</span><span class="tag">#Automotive</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Automotive CGI</div>
+                    <p class="long-desc">Modellierung und Rendering eines elektrischen Concept Cars. Die Studie beleuchtet aerodynamische Formen und Lichtführung in einer virtuellen Studio-Umgebung.</p>
+                    <a href="#" class="download-btn">Assets laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 12 -->
+            <article class="card reveal mix ui-ux digital">
+                 <div class="card-bg" style="background: #111;"></div>
+                <div class="card-header">
+                    <h2>Smart Home App</h2>
+                    <h3>IoT Interface</h3>
+                    <div class="tags"><span class="tag">#UI/UX</span><span class="tag">#Digital</span><span class="tag">#App</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Steuerung der Zukunft</div>
+                    <p class="long-desc">App-Design für die zentrale Steuerung von Smart-Home-Geräten. Ein minimalistisches Interface mit Voice-Control-Animationen und Energieverbrauchs-Tracking.</p>
+                    <a href="#" class="download-btn">UI Kit laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 13 -->
+            <article class="card reveal mix print">
+                <div class="card-bg bg-img" style="background-image: url('https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-header">
+                    <h2>Bauhaus 100</h2>
+                    <h3>Exhibition Poster</h3>
+                    <div class="tags"><span class="tag">#Print</span><span class="tag">#Typography</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Hommage an die Meister</div>
+                    <p class="long-desc">Eine Serie von 5 Postern anlässlich des Bauhaus-Jubiläums. Strenge geometrische Formen kombiniert mit den Primärfarben Rot, Gelb und Blau im Siebdruckverfahren.</p>
+                    <a href="#" class="download-btn">Poster PDF laden ↓</a>
+                </div>
+            </article>
+
+            <!-- Item 14 -->
+            <article class="card reveal mix video 3d">
+                <video class="card-bg bg-video" autoplay loop muted playsinline>
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-futuristic-scifi-tunnel-animation-3140-large.mp4" type="video/mp4">
+                </video>
+                <div class="card-header">
+                    <h2>Neon Tunnel</h2>
+                    <h3>Event Visuals</h3>
+                    <div class="tags"><span class="tag">#Video</span><span class="tag">#3D</span><span class="tag">#Motion</span></div>
+                </div>
+                <div class="card-overlay">
+                    <div class="short-desc">Immersive Club-Erfahrung</div>
+                    <p class="long-desc">Erstellung von VJ-Loops für eine große Techno-Veranstaltung. Endlose 3D-Tunnel, synchronisiert zu den BPM der Musik, projiziert auf riesige LED-Wände.</p>
+                    <a href="#" class="download-btn">VJ Loops laden ↓</a>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="reveal">
+        <div class="contact-content">
+            <h2>Ready to build something unique?</h2>
+            <a href="mailto:hello@artdirector.studio" class="big-email">hello@artdirector.studio</a>
+            <div class="socials">
+                <a href="#">Instagram</a>
+                <a href="#">Behance</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">Dribbble</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- JS LOGIC -->
+    <script>
+        // 1. Menu Toggle Animation
+        function toggleMenu() {
+            const menuBtn = document.querySelector('.menu-btn');
+            const overlay = document.querySelector('.nav-overlay');
+            menuBtn.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // 2. Extract Hashtags dynamically & build dropdown
+        const allTags = document.querySelectorAll('.tag');
+        const uniqueTags = new Set();
+        allTags.forEach(tag => uniqueTags.add(tag.textContent.trim())); // e.g. "#Print"
+
+        const hashtagList = document.getElementById('hashtagList');
+        uniqueTags.forEach(tag => {
+            const li = document.createElement('li');
+            li.textContent = tag;
+            li.addEventListener('click', () => {
+                document.getElementById('searchInput').value = tag;
+                executeFilter(tag, false);
+                toggleSearch(false); // Close dropdown after selection
+            });
+            hashtagList.appendChild(li);
+        });
+
+        // 3. Search Bar Interaction
+        const searchIcon = document.querySelector('.search-icon');
+        const searchBox = document.querySelector('.search-box');
+        const searchInput = document.getElementById('searchInput');
+        const dropdown = document.querySelector('.hashtag-dropdown');
+
+        function toggleSearch(forceState) {
+            const isActive = forceState !== undefined ? !forceState : searchBox.classList.contains('active');
+            if(isActive) {
+                searchBox.classList.remove('active');
+                dropdown.classList.remove('active');
+            } else {
+                searchBox.classList.add('active');
+                dropdown.classList.add('active');
+                searchInput.focus();
+            }
+        }
+
+        searchIcon.addEventListener('click', () => toggleSearch());
+
+        // Close search when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                toggleSearch(false);
+            }
+        });
+
+        // 4. Unified Filter Logic (Buttons + Search)
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.card');
+
+        function executeFilter(term, isCategoryBtn) {
+            const searchTerm = term.toLowerCase();
+
+            // Handle UI states
+            if (isCategoryBtn) {
+                searchInput.value = ''; // clear search if category button clicked
+                filterBtns.forEach(b => b.classList.remove('active'));
+                document.querySelector(`.filter-btn[data-filter="${term}"]`).classList.add('active');
+            } else {
+                filterBtns.forEach(b => b.classList.remove('active')); // clear active buttons if searching
+            }
+
+            // Animate & Filter Cards
+            cards.forEach(card => {
+                const title = card.querySelector('h2').textContent.toLowerCase();
+                const tagsText = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent.toLowerCase()).join(' ');
+                let match = false;
+
+                if (searchTerm === 'all' || searchTerm === '') {
+                    match = true;
+                } else if (isCategoryBtn) {
+                    match = card.classList.contains(searchTerm); // match exact class like 'print'
+                } else {
+                    // Search in title or tags
+                    match = title.includes(searchTerm) || tagsText.includes(searchTerm);
+                }
+
+                // Apply CSS Animations
+                card.classList.remove('fade-in');
+                card.classList.add('fade-out');
+
+                setTimeout(() => {
+                    if (match) {
+                        card.classList.remove('hidden');
+                        void card.offsetWidth; // Trigger reflow to restart animation
+                        card.classList.remove('fade-out');
+                        card.classList.add('fade-in');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                }, 300); // Wait for fade-out
+            });
+        }
+
+        // Event Listeners for Filter Buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                executeFilter(btn.getAttribute('data-filter'), true);
+            });
+        });
+
+        // Event Listener for Manual Search Input
+        searchInput.addEventListener('input', (e) => {
+            executeFilter(e.target.value, false);
+        });
+
+        // 5. Scroll Reveal Animation (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+    </script>
+</body>
+</html>
